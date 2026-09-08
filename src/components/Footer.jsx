@@ -17,8 +17,8 @@ export default function Footer() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pb-12 border-b border-linen/60">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <span className="w-5 h-5 rounded-full bg-ink text-sand flex items-center justify-center font-serif text-[11px] font-semibold">
-              {PERSONAL_INFO.monogram}
+            <span className="w-5 h-5 rounded-full bg-ink text-sand flex items-center justify-center font-serif text-[11px] font-semibold select-none overflow-hidden">
+              <span className="translate-y-[0.5px] inline-block leading-none">{PERSONAL_INFO.monogram}</span>
             </span>
             <span className="text-sm font-mono font-medium text-ink">
               {PERSONAL_INFO.name} ({PERSONAL_INFO.nickname})

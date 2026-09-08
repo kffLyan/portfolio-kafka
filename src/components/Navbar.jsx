@@ -74,8 +74,8 @@ export default function Navbar({ activeSection = 'hero', onOpenCommandPalette })
           onClick={(e) => scrollToSection(e, '#top')}
           className="group flex items-center gap-2.5 text-xs font-mono tracking-wider text-ink uppercase"
         >
-          <span className="w-7 h-7 rounded-full bg-ink text-sand flex items-center justify-center font-serif text-sm font-semibold leading-none text-center select-none group-hover:bg-terracotta transition-colors duration-300">
-            K
+          <span className="w-7 h-7 rounded-full bg-ink text-sand flex items-center justify-center font-serif text-sm font-semibold select-none group-hover:bg-terracotta transition-colors duration-300 overflow-hidden">
+            <span className="translate-y-[1px] inline-block leading-none">K</span>
           </span>
           <span className="inline-block font-semibold tracking-normal text-ink">
             {PERSONAL_INFO.nickname.toUpperCase()} LYANDRA
