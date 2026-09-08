@@ -90,7 +90,6 @@
 
 .dark .noise-overlay {
   opacity: 0.045;
-  mix-blend-mode: overlay;
 }
 
 /* Editorial typography utilities */

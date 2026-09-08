@@ -209,14 +209,14 @@ export default function CommandPalette({ isOpen, onClose }) {
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-28 px-4 pointer-events-auto">
-          {/* Backdrop: solid dark scrim without GPU-killing full-screen backdrop-blur */}
+          {/* Backdrop: solid dark scrim consistent across both light and dark modes */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             onClick={onClose}
-            className="fixed inset-0 bg-ink/50 dark:bg-black/60 will-change-[opacity]"
+            className="fixed inset-0 bg-black/60 will-change-[opacity]"
           />
 
           {/* Modal Container: hardware accelerated with instant smooth entrance */}
@@ -272,7 +272,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                       onMouseEnter={() => setSelectedIndex(idx)}
                       className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-left text-xs font-mono transition-colors duration-150 cursor-pointer ${
                         isSelected
-                          ? 'bg-bone text-ink font-medium shadow-sm'
+                          ? 'bg-bone text-ink font-medium shadow-sm border border-linen/60'
                           : 'text-stone hover:bg-bone/50 hover:text-ink'
                       }`}
                     >

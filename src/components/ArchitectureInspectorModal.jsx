@@ -71,23 +71,24 @@ export default function ArchitectureInspectorModal({ project, isOpen, onClose })
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto pointer-events-auto">
+          {/* Backdrop: consistent dark dimming in both light and dark mode without blur lag */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             onClick={onClose}
-            className="fixed inset-0 bg-ink/60 backdrop-blur-md"
+            className="fixed inset-0 bg-black/60 will-change-[opacity]"
           />
 
           {/* Modal Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            initial={{ opacity: 0, scale: 0.98, y: -8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-            className="relative w-full max-w-3xl rounded-3xl bg-sand border border-linen shadow-[0_25px_70px_rgba(26,36,33,0.25)] z-10 overflow-hidden text-ink font-sans my-auto max-h-[90vh] flex flex-col"
+            exit={{ opacity: 0, scale: 0.98, y: -8 }}
+            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-3xl rounded-3xl bg-sand border border-linen shadow-[0_25px_70px_rgba(26,36,33,0.25)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.6)] z-10 overflow-hidden text-ink font-sans my-auto max-h-[90vh] flex flex-col transform-gpu will-change-transform"
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 sm:px-8 py-5 border-b border-linen bg-bone/60">
