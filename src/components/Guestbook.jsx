@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Check, Copy, ArrowUpRight, MessageSquareQuote, Loader2 } from 'lucide-react';
+import { Send, Check, Copy, ArrowUpRight, MessageSquareQuote, Loader2, Pin } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { 
@@ -8,6 +8,19 @@ import {
   addGuestbookEntry, 
   subscribeToGuestbookUpdates 
 } from '../services/guestbookService';
+
+function isOwnerEntry(entry) {
+  if (!entry) return false;
+  const name = (entry.name || '').toLowerCase();
+  const role = (entry.role || '').toLowerCase();
+  return (
+    name.includes('kafka') ||
+    role.includes('author') ||
+    role.includes('owner') ||
+    role.includes('creator') ||
+    role.includes('tuan rumah')
+  );
+}
 
 function InstagramIcon({ className = "w-4 h-4" }) {
   return (
@@ -74,6 +87,16 @@ export default function Guestbook() {
     };
   }, []);
 
+  const sortedEntries = useMemo(() => {
+    return [...entries].sort((a, b) => {
+      const aPinned = isOwnerEntry(a);
+      const bPinned = isOwnerEntry(b);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    });
+  }, [entries]);
+
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(PERSONAL_INFO.email);
     setCopiedEmail(true);
@@ -85,46 +108,32 @@ export default function Guestbook() {
     if (!name.trim() || !message.trim()) return;
 
     setIsSubmitting(true);
-
     try {
-      const addedEntry = await addGuestbookEntry({
+      const newEntry = await addGuestbookEntry({
         name: name.trim(),
-        role: role.trim() || 'Visitor / Collaborator',
+        role: role.trim(),
         message: message.trim(),
       });
 
-      // Optimistically update or prepend if not already in list
-      setEntries((prev) => {
-        if (prev.some((entry) => entry.id === addedEntry.id)) return prev;
-        return [addedEntry, ...prev];
-      });
-
-      // Micro-celebration
-      confetti({
-        particleCount: 45,
-        spread: 65,
-        origin: { y: 0.85 },
-        colors: ['#C85A32', '#1A2421', '#E3DEC3'],
-        ticks: 120,
-        gravity: 1.2,
-        scalar: 0.9,
-      });
-
+      setEntries((prev) => [newEntry, ...prev]);
       setName('');
       setMessage('');
       setRole('');
+
+      // Trigger subtle confetti burst
+      confetti({
+        particleCount: 40,
+        spread: 55,
+        origin: { y: 0.8 },
+        colors: ['#C85A32', '#1A2421', '#E3DEC3'],
+        disableForReducedMotion: true,
+      });
     } catch (err) {
-      console.error('Error submitting guestbook entry:', err);
+      console.error('Failed to submit entry:', err);
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const socials = [
-    { label: 'GitHub (kffLyan)', href: PERSONAL_INFO.github },
-    { label: 'LinkedIn', href: PERSONAL_INFO.linkedin },
-    { label: `Instagram (${PERSONAL_INFO.instagramHandle})`, href: PERSONAL_INFO.instagram },
-  ];
 
   const formatDate = (isoString) => {
     try {
@@ -140,15 +149,16 @@ export default function Guestbook() {
   };
 
   return (
-    <section id="guestbook" className="py-24 sm:py-32 px-6 sm:px-10 md:px-16 max-w-7xl mx-auto">
-      {/* Editorial Section Label */}
-      <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-widest text-stone mb-10">
-        <span>03 // CORRESPONDENCE & GUESTBOOK</span>
+    <section id="guestbook" className="pt-20 pb-32 px-6 sm:px-10 md:px-16 max-w-7xl mx-auto">
+      {/* Section Header */}
+      <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-widest text-stone mb-4">
+        <span className="w-2 h-2 rounded-full bg-terracotta"></span>
+        <span>04 // CORRESPONDENCE</span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-        {/* Left Column: Direct Contact & Socials */}
-        <div className="lg:col-span-5 flex flex-col justify-between">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        {/* Left Column: Context, Pitch & Direct Channels */}
+        <div className="lg:col-span-5 flex flex-col justify-between h-full">
           <div>
             <h2 className="font-serif text-3xl sm:text-5xl text-ink font-normal tracking-tight mb-6">
               Connect & Collaborate.
@@ -222,25 +232,41 @@ export default function Guestbook() {
               </a>
             </div>
 
-            {/* Socials with Animated Underline Slide */}
-            <div className="flex flex-col gap-4">
-              <span className="text-xs font-mono uppercase tracking-widest text-stone">
+            {/* Public Profile Metas */}
+            <div className="space-y-3 font-mono text-xs text-stone">
+              <span className="uppercase tracking-widest text-[11px] block text-ink font-semibold mb-2">
                 DIGITAL FOOTPRINT
               </span>
-              <div className="flex flex-wrap gap-x-6 gap-y-3">
-                {socials.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group relative inline-flex items-center gap-1.5 text-sm font-mono text-ink/90 hover:text-terracotta transition-colors py-1"
-                  >
-                    <span>{social.label}</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 text-stone group-hover:text-terracotta" />
-                    <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-terracotta transition-all duration-300 group-hover:w-full" />
-                  </a>
-                ))}
+              <div className="flex items-center gap-6">
+                <a
+                  href={PERSONAL_INFO.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-ink transition-colors flex items-center gap-1.5"
+                >
+                  <span>GitHub ({PERSONAL_INFO.githubUsername})</span>
+                  <ArrowUpRight className="w-3 h-3 text-terracotta" />
+                </a>
+                <a
+                  href={PERSONAL_INFO.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-ink transition-colors flex items-center gap-1.5"
+                >
+                  <span>LinkedIn</span>
+                  <ArrowUpRight className="w-3 h-3 text-terracotta" />
+                </a>
+              </div>
+              <div>
+                <a
+                  href={PERSONAL_INFO.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-ink transition-colors flex items-center gap-1.5"
+                >
+                  <span>Instagram ({PERSONAL_INFO.instagramHandle})</span>
+                  <ArrowUpRight className="w-3 h-3 text-terracotta" />
+                </a>
               </div>
             </div>
           </div>
@@ -342,33 +368,50 @@ export default function Guestbook() {
 
             <div className="space-y-3.5 max-h-[440px] overflow-y-auto pr-1">
               <AnimatePresence initial={false}>
-                {entries.map((entry) => (
-                  <motion.div
-                    key={entry.id}
-                    initial={{ opacity: 0, y: -20, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ type: 'spring', stiffness: 220, damping: 20 }}
-                    className="p-5 rounded-2xl bg-bone/40 border border-linen/80 hover:border-linen transition-colors"
-                  >
-                    <div className="flex items-center justify-between gap-4 mb-2 text-xs font-mono">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-ink">{entry.name}</span>
-                        <span className="text-stone/70">&bull;</span>
-                        <span className="text-stone">{entry.role}</span>
+                {sortedEntries.map((entry) => {
+                  const isOwner = isOwnerEntry(entry);
+                  return (
+                    <motion.div
+                      key={entry.id}
+                      initial={{ opacity: 0, y: -20, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ type: 'spring', stiffness: 220, damping: 20 }}
+                      className={`p-5 rounded-2xl transition-all duration-200 ${
+                        isOwner
+                          ? 'bg-terracotta/[0.04] border border-terracotta/40 dark:border-terracotta/30 shadow-[0_4px_24px_rgba(200,90,50,0.06)]'
+                          : 'bg-bone/40 border border-linen/80 hover:border-linen transition-colors'
+                      }`}
+                    >
+                      {/* Pinned Owner Badge */}
+                      {isOwner && (
+                        <div className="flex items-center gap-1.5 w-fit px-2.5 py-0.5 mb-2.5 rounded-full bg-terracotta/10 border border-terracotta/30 text-[10px] font-mono font-semibold uppercase tracking-wider text-terracotta">
+                          <Pin className="w-2.5 h-2.5 rotate-45" />
+                          <span>Pinned &bull; Author</span>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between gap-4 mb-2 text-xs font-mono">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`font-semibold ${isOwner ? 'text-terracotta' : 'text-ink'}`}>
+                            {entry.name}
+                          </span>
+                          <span className="text-stone/70">&bull;</span>
+                          <span className="text-stone">{entry.role}</span>
+                        </div>
+                        <span className="text-[11px] text-stone/80 tabular-nums shrink-0">
+                          {formatDate(entry.timestamp)}
+                        </span>
                       </div>
-                      <span className="text-[11px] text-stone/80 tabular-nums shrink-0">
-                        {formatDate(entry.timestamp)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-ink/90 font-serif leading-relaxed">
-                      "{entry.message}"
-                    </p>
-                  </motion.div>
-                ))}
+                      <p className="text-sm text-ink/90 font-serif leading-relaxed">
+                        "{entry.message}"
+                      </p>
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
 
-              {entries.length === 0 && !isLoading && (
+              {sortedEntries.length === 0 && !isLoading && (
                 <div className="p-8 rounded-2xl bg-bone/30 border border-dashed border-linen text-center">
                   <p className="text-sm font-mono text-stone mb-1">Belum ada catatan masuk.</p>
                   <p className="text-xs text-stone/70">Jadilah yang pertama menulis pesan atau feedback di atas!</p>

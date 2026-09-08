@@ -12,6 +12,7 @@ export const PERSONAL_INFO = {
   instagram: "https://www.instagram.com/mkyandra_/",
   instagramHandle: "@mkyandra_",
   github: "https://github.com/kffLyan",
+  githubUsername: "kffLyan",
   linkedin: "https://www.linkedin.com/in/muhammad-kafka-lyandra-pratama-357153394/",
   leadership: "Ketua Kelas XII RPL & Wakil Ketua Komisi D MPK",
   heroHeadline: [
