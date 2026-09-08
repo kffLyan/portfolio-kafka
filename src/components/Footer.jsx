@@ -47,7 +47,7 @@ export default function Footer() {
           &copy; {new Date().getFullYear()} {PERSONAL_INFO.name}. All structural rights reserved.
         </p>
         <p className="flex items-center gap-3">
-          <span>Engineered with Lenis &bull; Framer Motion &bull; Tailwind CSS &bull; Vite</span>
+          <span>Engineered with React • Framer Motion • Tailwind CSS • Vite</span>
         </p>
       </div>
     </footer>

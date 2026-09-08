@@ -133,7 +133,7 @@ export default function Hero() {
               href="#about"
               className="text-xs font-mono uppercase tracking-wider text-stone hover:text-ink transition-colors px-3 py-2"
             >
-              Read Philosophy &rarr;
+              Tentang Kafka &rarr;
             </a>
           </motion.div>
         </div>

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Lenis from 'lenis';
 import GrainOverlay from './components/GrainOverlay';
 import Preloader from './components/Preloader';
 import Navbar from './components/Navbar';
@@ -19,32 +18,6 @@ export default function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const { theme, isDark } = useTheme();
 
-  // Initialize Lenis smooth momentum scroll
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.8,
-    });
-
-    let animationFrameId;
-    function raf(time) {
-      lenis.raf(time);
-      animationFrameId = requestAnimationFrame(raf);
-    }
-    animationFrameId = requestAnimationFrame(raf);
-
-    window.__lenis = lenis;
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      lenis.destroy();
-    };
-  }, []);
 
   // Global keyboard shortcut for Command Palette (⌘K / Ctrl+K)
   useEffect(() => {

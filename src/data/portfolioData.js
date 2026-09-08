@@ -15,12 +15,31 @@ export const PERSONAL_INFO = {
   linkedin: "https://www.linkedin.com/in/muhammad-kafka-lyandra-pratama-357153394/",
   leadership: "Ketua Kelas XII RPL & Wakil Ketua Komisi D MPK",
   heroHeadline: [
-    "Engineering Scalable,",
-    "Reliable Backend &",
-    "Software Systems."
+    "Halo, Saya Kafka.",
+    "Backend & Software Engineer."
   ],
-  heroBio: "Software Engineering student at SMK Budi Bakti Ciwidey specializing in backend infrastructure, robust API contracts, multi-role RBAC security, and scalable databases across Laravel, Next.js, and modern distributed systems.",
-  philosophy: "True software engineering is built on reliability, zero-trust security, and scalable backend architecture. I engineer clean APIs, maintainable database schemas, and resilient server-side systems designed for production stability."
+  heroBio: "Siswa SMK Budi Bakti Ciwidey jurusan PPLG / RPL yang berfokus pada rekayasa backend, arsitektur database relasional, keamanan multi-role RBAC & anti-IDOR, serta pengembangan aplikasi modern menggunakan Laravel, Next.js, dan cloud PostgreSQL.",
+  philosophy: "Rekayasa perangkat lunak sejati bertumpu pada keandalan sistem, keamanan zero-trust, dan struktur backend yang kokoh. Saya membangun API yang bersih, skema database teroptimasi, dan logika server yang tahan uji untuk kebutuhan produksi nyata.",
+  profileDetails: {
+    fullName: "Muhammad Kafka Lyandra Pratama",
+    nickname: "Kafka",
+    school: "SMK Budi Bakti Ciwidey",
+    major: "Pengembangan Perangkat Lunak dan Gim (PPLG / RPL)",
+    classGrade: "Kelas XII (Tahun Ajaran 2024 – 2027)",
+    roles: [
+      "Ketua Kelas XII RPL",
+      "Wakil Ketua Komisi D MPK SMK Budi Bakti Ciwidey"
+    ],
+    status: "Terbuka untuk Prakerin / Magang Industri & Kolaborasi Software Engineering",
+    location: "Ciwidey, Kab. Bandung, Jawa Barat (WIB / UTC+7)",
+    focus: "Backend Architecture, RESTful API, Database Design, RBAC & Anti-IDOR Security",
+    coreStacks: ["Laravel (PHP)", "Next.js 16", "PostgreSQL (Neon)", "MySQL", "Prisma ORM", "TypeScript", "C++", "Python"],
+    achievements: [
+      "Juara 2 LKS Pemrograman C++ Tingkat Sekolah (Aplikasi Kasir Berbasis Logika)",
+      "Programmer IoT Teaching Factory (TEFA) Smart Parking bersama Mitra Industri",
+      "Arsitek Backend SI REMED v2 (Zero IDOR) & E-Voting OSIS v2 (Token Kriptografis)"
+    ]
+  }
 };
 
 export const METRICS = [
