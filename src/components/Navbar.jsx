@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Volume2, VolumeX, Command, Sun, Moon } from 'lucide-react';
+import { Command, Sun, Moon } from 'lucide-react';
+import AudioWaveform from './AudioWaveform';
 import MagneticButton from './MagneticButton';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { playTactileClick, toggleAudioMuted, getAudioMuted, subscribeAudioState } from '../utils/audio';
@@ -118,14 +119,14 @@ export default function Navbar({ activeSection = 'hero', onOpenCommandPalette })
 
           <div className="hidden sm:block w-[1px] h-4 bg-linen/80" />
 
-          {/* Audio Haptic Toggle */}
+          {/* Audio Waveform Toggle */}
           <button
             onClick={() => toggleAudioMuted()}
-            className="p-1.5 rounded-full bg-bone border border-linen text-stone hover:text-terracotta transition-colors cursor-pointer"
+            className="p-1.5 rounded-full bg-bone border border-linen text-stone hover:text-terracotta transition-colors cursor-pointer flex items-center justify-center"
             title={isAudioMuted ? 'Unmute tactile clicks' : 'Mute tactile clicks'}
             aria-label="Toggle sound"
           >
-            {isAudioMuted ? <VolumeX className="w-3.5 h-3.5 text-stone/60" /> : <Volume2 className="w-3.5 h-3.5" />}
+            <AudioWaveform isMuted={isAudioMuted} className={isAudioMuted ? 'text-stone/60' : ''} />
           </button>
 
           {/* Tactile Pill Theme Switcher with Spring Physics */}

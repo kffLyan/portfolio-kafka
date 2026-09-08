@@ -10,9 +10,12 @@ import Footer from './components/Footer';
 import CommandPalette from './components/CommandPalette';
 import FloatingControlDock from './components/FloatingControlDock';
 import VelocitySkew from './components/VelocitySkew';
+import KineticMarquee from './components/KineticMarquee';
+import CustomCursor, { CursorProvider } from './components/CustomCursor';
 
 export default function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [preloaderFinished, setPreloaderFinished] = useState(false);
 
   const handleOpenPalette = React.useCallback(() => {
     setIsCommandPaletteOpen(true);
@@ -42,6 +45,12 @@ export default function App() {
       <main className="relative z-10 flex flex-col">
         <VelocitySkew>
           <Hero />
+        </VelocitySkew>
+
+        {/* Kinetic Marquee Strip — Editorial Divider */}
+        <KineticMarquee />
+
+        <VelocitySkew>
           <AboutMetrics />
         </VelocitySkew>
 
@@ -57,30 +66,35 @@ export default function App() {
   );
 
   return (
-    <div className="relative min-h-screen bg-sand text-ink selection:bg-terracotta selection:text-sand font-sans">
-      {/* Viewport-wide SVG Procedural Noise (0.035 opacity) */}
-      <GrainOverlay />
+    <CursorProvider>
+      <div className="relative min-h-screen bg-sand text-ink selection:bg-terracotta selection:text-sand font-sans">
+        {/* Bespoke Editorial Cursor (desktop only) */}
+        <CustomCursor />
 
-      {/* Initial Minimalist 00-100 Preloader */}
-      <Preloader onComplete={() => setPreloaderFinished(true)} />
+        {/* Viewport-wide SVG Procedural Noise (0.035 opacity) */}
+        <GrainOverlay />
 
-      {/* Floating Minimalist Navbar */}
-      <Navbar onOpenCommandPalette={handleOpenPalette} />
+        {/* Initial Minimalist 00-100 Preloader */}
+        <Preloader onComplete={() => setPreloaderFinished(true)} />
 
-      {/* Command Palette (⌘K / Ctrl+K) */}
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={handleClosePalette}
-      />
+        {/* Floating Minimalist Navbar */}
+        <Navbar onOpenCommandPalette={handleOpenPalette} />
 
-      {/* Main Content Flow */}
-      {mainContent}
+        {/* Command Palette (⌘K / Ctrl+K) */}
+        <CommandPalette
+          isOpen={isCommandPaletteOpen}
+          onClose={handleClosePalette}
+        />
 
-      {/* Persistent Ergonomic Floating System Controls (Bottom-Right) */}
-      <FloatingControlDock onOpenCommandPalette={handleOpenPalette} />
+        {/* Main Content Flow */}
+        {mainContent}
 
-      {/* Editorial Colophon Footer */}
-      <Footer />
-    </div>
+        {/* Persistent Ergonomic Floating System Controls (Bottom-Right) */}
+        <FloatingControlDock onOpenCommandPalette={handleOpenPalette} />
+
+        {/* Editorial Colophon Footer */}
+        <Footer />
+      </div>
+    </CursorProvider>
   );
 }

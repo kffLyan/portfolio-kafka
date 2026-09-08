@@ -4,7 +4,10 @@ import { ArrowUpRight, ExternalLink, Cpu, ShieldCheck, Layers, LayoutGrid, Rows3
 import { PROJECTS, CERTIFICATES, TECH_STACK } from '../data/portfolioData';
 import TokenSandbox from './TokenSandbox';
 import ArchitectureInspectorModal from './ArchitectureInspectorModal';
+import InspectWireDrawer from './InspectWireDrawer';
 import { playTactileClick } from '../utils/audio';
+import { useTheme } from '../context/ThemeContext';
+import useTiltSheen from '../hooks/useTiltSheen';
 
 function GithubIcon({ className = "w-3.5 h-3.5" }) {
   return (
@@ -22,6 +25,17 @@ function GithubIcon({ className = "w-3.5 h-3.5" }) {
  */
 function EditorialShowcaseCard({ project, index = 0, total = 6, onInspect }) {
   const topOffset = 80 + index * 12;
+  const { isDark } = useTheme();
+  const [wireOpen, setWireOpen] = useState(false);
+  const {
+    cardRef,
+    tiltStyle,
+    cardStyle,
+    sheenStyle,
+    sheenStyleDark,
+    onMouseMove,
+    onMouseLeave,
+  } = useTiltSheen({ maxTilt: 4, perspective: 1200 });
 
   return (
     <div 
@@ -29,125 +43,153 @@ function EditorialShowcaseCard({ project, index = 0, total = 6, onInspect }) {
         position: 'sticky',
         top: `${topOffset}px`,
         zIndex: index + 10,
-        transform: 'translate3d(0, 0, 0)',
-        willChange: 'transform',
+        ...tiltStyle,
       }}
-      className="mb-16 sm:mb-24 rounded-3xl bg-bone border border-linen p-6 sm:p-10 shadow-[0_8px_36px_rgba(26,36,33,0.07)] dark:shadow-[0_18px_52px_rgba(0,0,0,0.55)] hover:shadow-[0_14px_48px_rgba(26,36,33,0.12)] dark:hover:shadow-[0_22px_60px_rgba(0,0,0,0.7)] transition-shadow duration-300"
+      className="mb-16 sm:mb-24"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Info Column */}
-        <div className="lg:col-span-6 flex flex-col justify-between h-full">
-          <div>
-            {/* Metadata Header */}
-            <div className="flex items-center justify-between text-xs font-mono text-stone pb-3 mb-4 border-b border-linen/70">
-              <span className="font-semibold text-terracotta">
-                SYSTEM // {project.id}
+      <motion.div
+        ref={cardRef}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        style={{
+          ...cardStyle,
+          transform: 'translate3d(0, 0, 0)',
+          willChange: 'transform',
+        }}
+        className="relative rounded-3xl bg-bone border border-linen p-6 sm:p-10 shadow-[0_8px_36px_rgba(26,36,33,0.07)] dark:shadow-[0_18px_52px_rgba(0,0,0,0.55)] hover:shadow-[0_14px_48px_rgba(26,36,33,0.12)] dark:hover:shadow-[0_22px_60px_rgba(0,0,0,0.7)] transition-shadow duration-300"
+        data-cursor="project"
+      >
+        {/* Specular Sheen */}
+        <div
+          style={isDark ? sheenStyleDark : sheenStyle}
+          className="rounded-3xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          aria-hidden="true"
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Info Column */}
+          <div className="lg:col-span-6 flex flex-col justify-between h-full">
+            <div>
+              {/* Metadata Header */}
+              <div className="flex items-center justify-between text-xs font-mono text-stone pb-3 mb-4 border-b border-linen/70">
+                <span className="font-semibold text-terracotta">
+                  SYSTEM // {project.id}
+                </span>
+                <span>{project.year} &bull; {project.role}</span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5 mb-2.5">
+                <h3 className="font-serif text-3xl sm:text-4xl text-ink font-normal tracking-tight">
+                  {project.title}
+                </h3>
+                {project.featured && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-terracotta/10 text-terracotta border border-terracotta/30 uppercase font-semibold">
+                    Flagship
+                  </span>
+                )}
+              </div>
+
+              <span className="inline-block text-xs font-mono text-stone/90 uppercase tracking-wider mb-3">
+                {project.category}
               </span>
-              <span>{project.year} &bull; {project.role}</span>
+
+              <p className="text-sm text-stone leading-relaxed mb-5 font-sans">
+                {project.description}
+              </p>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {project.tags.map((tag, tIdx) => (
+                  <span
+                    key={tIdx}
+                    className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-sand border border-linen text-ink/90"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 mb-2.5">
-              <h3 className="font-serif text-3xl sm:text-4xl text-ink font-normal tracking-tight">
-                {project.title}
-              </h3>
-              {project.featured && (
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-terracotta/10 text-terracotta border border-terracotta/30 uppercase font-semibold">
-                  Flagship
-                </span>
-              )}
-            </div>
+            {/* Action Links & Key Metric */}
+            <div>
+              <div className="flex flex-wrap items-center gap-3 text-xs font-mono pt-4 border-t border-linen/70">
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => playTactileClick('soft')}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-ink text-sand hover:bg-terracotta transition-colors uppercase tracking-wider font-semibold"
+                  >
+                    <span>Live Deploy</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
 
-            <span className="inline-block text-xs font-mono text-stone/90 uppercase tracking-wider mb-3">
-              {project.category}
-            </span>
+                {project.githubUrl && (
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => playTactileClick('soft')}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sand border border-linen text-ink hover:border-terracotta transition-colors uppercase tracking-wider font-semibold"
+                  >
+                    <GithubIcon className="w-3.5 h-3.5" />
+                    <span>Repo</span>
+                  </a>
+                )}
 
-            <p className="text-sm text-stone leading-relaxed mb-5 font-sans">
-              {project.description}
-            </p>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {project.tags.map((tag, tIdx) => (
-                <span
-                  key={tIdx}
-                  className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-sand border border-linen text-ink/90"
+                {/* High-End Technical Inspector Trigger Button */}
+                <button
+                  onClick={() => {
+                    playTactileClick('snap');
+                    onInspect(project);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-terracotta/10 border border-terracotta/40 text-terracotta hover:bg-terracotta hover:text-sand transition-colors uppercase font-semibold tracking-wider cursor-pointer"
+                  title="Inspect Architecture, Dataflow & RBAC"
                 >
-                  {tag}
+                  <Cpu className="w-3.5 h-3.5" />
+                  <span>Architecture Spec ⚡</span>
+                </button>
+
+                <span className="text-[11px] text-stone font-mono font-medium ml-auto">
+                  {project.metric}
                 </span>
-              ))}
+              </div>
+
+              {/* Inspect Wire Telemetry Drawer */}
+              <InspectWireDrawer
+                project={project}
+                isOpen={wireOpen}
+                onToggle={() => setWireOpen((v) => !v)}
+              />
+
+              {/* Embedded Token Sandbox for OSIS Voting Project */}
+              {project.title.includes('OSIS') && (
+                <div data-cursor="interact">
+                  <TokenSandbox />
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Action Links & Key Metric */}
-          <div>
-            <div className="flex flex-wrap items-center gap-3 text-xs font-mono pt-4 border-t border-linen/70">
-              {project.liveUrl && (
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => playTactileClick('soft')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-ink text-sand hover:bg-terracotta transition-colors uppercase tracking-wider font-semibold"
-                >
-                  <span>Live Deploy</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-
-              {project.githubUrl && (
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => playTactileClick('soft')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sand border border-linen text-ink hover:border-terracotta transition-colors uppercase tracking-wider font-semibold"
-                >
-                  <GithubIcon className="w-3.5 h-3.5" />
-                  <span>Repo</span>
-                </a>
-              )}
-
-              {/* High-End Technical Inspector Trigger Button */}
-              <button
-                onClick={() => {
-                  playTactileClick('snap');
-                  onInspect(project);
-                }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-terracotta/10 border border-terracotta/40 text-terracotta hover:bg-terracotta hover:text-sand transition-colors uppercase font-semibold tracking-wider cursor-pointer"
-                title="Inspect Architecture, Dataflow & RBAC"
-              >
-                <Cpu className="w-3.5 h-3.5" />
-                <span>Architecture Spec ⚡</span>
-              </button>
-
-              <span className="text-[11px] text-stone font-mono font-medium ml-auto">
-                {project.metric}
-              </span>
+          {/* Right Preview Image Column */}
+          <div className="lg:col-span-6 rounded-2xl overflow-hidden bg-sand border border-linen/90 p-2 sm:p-2.5 shadow-inner">
+            <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden group">
+              <img
+                src={project.image}
+                alt={project.title}
+                className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent flex items-end p-4">
+                <span className="text-xs font-mono text-sand uppercase tracking-wider bg-ink/80 px-2.5 py-1 rounded backdrop-blur-sm">
+                  VERIFIED ARCHITECTURE
+                </span>
+              </div>
             </div>
-
-            {/* Embedded Token Sandbox for OSIS Voting Project */}
-            {project.title.includes('OSIS') && (
-              <TokenSandbox />
-            )}
           </div>
         </div>
-
-        {/* Right Preview Image Column */}
-        <div className="lg:col-span-6 rounded-2xl overflow-hidden bg-sand border border-linen/90 p-2 sm:p-2.5 shadow-inner">
-          <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden group">
-            <img
-              src={project.image}
-              alt={project.title}
-              className="w-full h-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent flex items-end p-4">
-              <span className="text-xs font-mono text-sand uppercase tracking-wider bg-ink/80 px-2.5 py-1 rounded backdrop-blur-sm">
-                VERIFIED ARCHITECTURE
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -157,8 +199,34 @@ function EditorialShowcaseCard({ project, index = 0, total = 6, onInspect }) {
  * Luxury 2-column magazine grid view
  */
 function EditorialGridCard({ project, onInspect }) {
+  const { isDark } = useTheme();
+  const [wireOpen, setWireOpen] = useState(false);
+  const {
+    cardRef,
+    tiltStyle,
+    cardStyle,
+    sheenStyle,
+    sheenStyleDark,
+    onMouseMove,
+    onMouseLeave,
+  } = useTiltSheen({ maxTilt: 5, perspective: 1000 });
+
   return (
-    <div className="rounded-3xl bg-bone border border-linen p-6 flex flex-col justify-between shadow-sm dark:shadow-[0_12px_36px_rgba(0,0,0,0.45)] hover:shadow-md dark:hover:shadow-[0_16px_44px_rgba(0,0,0,0.6)] transition-shadow">
+    <div style={tiltStyle}>
+    <motion.div
+      ref={cardRef}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      style={cardStyle}
+      className="relative rounded-3xl bg-bone border border-linen p-6 flex flex-col justify-between shadow-sm dark:shadow-[0_12px_36px_rgba(0,0,0,0.45)] hover:shadow-md dark:hover:shadow-[0_16px_44px_rgba(0,0,0,0.6)] transition-shadow"
+      data-cursor="project"
+    >
+      {/* Specular Sheen */}
+      <div
+        style={isDark ? sheenStyleDark : sheenStyle}
+        className="rounded-3xl opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        aria-hidden="true"
+      />
       <div>
         <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden mb-5 border border-linen">
           <img
@@ -193,32 +261,40 @@ function EditorialGridCard({ project, onInspect }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-linen/70 text-xs font-mono">
-        <button
-          onClick={() => {
-            playTactileClick('snap');
-            onInspect(project);
-          }}
-          className="inline-flex items-center gap-1 text-terracotta hover:underline font-semibold cursor-pointer"
-        >
-          <Cpu className="w-3.5 h-3.5" />
-          <span>Spec ⚡</span>
-        </button>
+      <div>
+        <div className="flex items-center justify-between pt-4 border-t border-linen/70 text-xs font-mono">
+          <button
+            onClick={() => {
+              playTactileClick('snap');
+              onInspect(project);
+            }}
+            className="inline-flex items-center gap-1 text-terracotta hover:underline font-semibold cursor-pointer"
+          >
+            <Cpu className="w-3.5 h-3.5" />
+            <span>Spec ⚡</span>
+          </button>
 
-        <div className="flex items-center gap-3">
-          {project.liveUrl && (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="text-ink hover:text-terracotta font-medium flex items-center gap-1">
-              <span>Live</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
-          {project.githubUrl && (
-            <a href={project.githubUrl} target="_blank" rel="noreferrer" className="text-stone hover:text-ink">
-              <GithubIcon className="w-3.5 h-3.5" />
-            </a>
-          )}
+          <div className="flex items-center gap-3">
+            {project.liveUrl && (
+              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="text-ink hover:text-terracotta font-medium flex items-center gap-1">
+                <span>Live</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+            {project.githubUrl && (
+              <a href={project.githubUrl} target="_blank" rel="noreferrer" className="text-stone hover:text-ink">
+                <GithubIcon className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </div>
         </div>
+        <InspectWireDrawer
+          project={project}
+          isOpen={wireOpen}
+          onToggle={() => setWireOpen((v) => !v)}
+        />
       </div>
+    </motion.div>
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon, Volume2, VolumeX, Command, ArrowUp } from 'lucide-react';
+import { Sun, Moon, Command, ArrowUp } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toggleAudioMuted, getAudioMuted, subscribeAudioState, playTactileClick } from '../utils/audio';
+import AudioWaveform from './AudioWaveform';
 
 /**
  * FloatingControlDock
@@ -73,18 +74,14 @@ export default function FloatingControlDock({ onOpenCommandPalette }) {
           </span>
         </button>
 
-        {/* Tactile Audio Mute Toggle */}
+        {/* Tactile Audio Waveform Toggle */}
         <button
           onClick={handleAudioToggle}
-          className="p-2 rounded-full bg-sand border border-linen/80 text-stone hover:text-ink hover:border-terracotta transition-colors cursor-pointer"
+          className="p-2 rounded-full bg-sand border border-linen/80 text-stone hover:text-terracotta hover:border-terracotta transition-colors cursor-pointer flex items-center justify-center"
           title={isAudioMuted ? "Unmute tactile audio clicks" : "Mute tactile audio clicks"}
           aria-label="Toggle sound"
         >
-          {isAudioMuted ? (
-            <VolumeX className="w-4 h-4 text-stone/60" />
-          ) : (
-            <Volume2 className="w-4 h-4 text-terracotta" />
-          )}
+          <AudioWaveform isMuted={isAudioMuted} className={isAudioMuted ? 'text-stone/60' : 'text-terracotta'} />
         </button>
 
         {/* ⌘K Command Palette Trigger */}

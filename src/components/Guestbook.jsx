@@ -183,6 +183,7 @@ export default function Guestbook() {
 
               <button
                 onClick={handleCopyEmail}
+                data-cursor="copy"
                 className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-sand border border-linen text-xs font-mono text-ink hover:border-terracotta/70 transition-all cursor-pointer self-start sm:self-auto"
                 title="Copy email address"
               >

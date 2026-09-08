@@ -1,55 +1,28 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { playTactileClick } from '../utils/audio';
+import { useTheme } from '../context/ThemeContext';
+import useTiltSheen from '../hooks/useTiltSheen';
 
 /**
  * EditorialPortrait
  * Physical exhibition mat-board frame for Muhammad Kafka Lyandra Pratama.
  * Features 3:4 portrait ratio, grayscale-to-color darkroom hover transition,
- * terracotta corner notch, monospace caption, and subtle 3D parallax tilt.
+ * terracotta corner notch, monospace caption, 3D parallax tilt, and
+ * dynamic specular sheen that follows cursor.
  */
 export default function EditorialPortrait() {
-  const cardRef = useRef(null);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  useEffect(() => {
-    const checkTouch = () => {
-      setIsTouchDevice(
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0 ||
-        window.innerWidth < 1024
-      );
-    };
-    checkTouch();
-    window.addEventListener('resize', checkTouch);
-    return () => window.removeEventListener('resize', checkTouch);
-  }, []);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [6, -6]), {
-    stiffness: 280,
-    damping: 24,
-  });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), {
-    stiffness: 280,
-    damping: 24,
-  });
-
-  const handleMouseMove = (e) => {
-    if (isTouchDevice || !cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(x);
-    mouseY.set(y);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
+  const { isDark } = useTheme();
+  const {
+    cardRef,
+    tiltStyle,
+    cardStyle,
+    sheenStyle,
+    sheenStyleDark,
+    onMouseMove,
+    onMouseLeave,
+    isTouch,
+  } = useTiltSheen({ maxTilt: 6, perspective: 1000 });
 
   return (
     <motion.div
@@ -57,20 +30,24 @@ export default function EditorialPortrait() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
       className="w-full max-w-[340px] sm:max-w-[380px] lg:max-w-[420px] mx-auto lg:ml-auto"
-      style={{ perspective: 1000 }}
+      style={tiltStyle}
     >
       <motion.div
         ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
         onClick={() => playTactileClick('soft')}
-        style={{
-          rotateX: isTouchDevice ? 0 : rotateX,
-          rotateY: isTouchDevice ? 0 : rotateY,
-          transformStyle: 'preserve-3d',
-        }}
+        style={cardStyle}
         className="group relative rounded-2xl bg-bone border border-linen p-2 sm:p-2.5 shadow-[0_18px_50px_rgba(26,36,33,0.07)] transition-shadow duration-500 hover:shadow-[0_24px_60px_rgba(200,90,50,0.12)] cursor-pointer"
+        data-cursor="project"
       >
+        {/* Specular Light Sheen Overlay */}
+        <div
+          style={isDark ? sheenStyleDark : sheenStyle}
+          className="rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          aria-hidden="true"
+        />
+
         {/* Hairline Decorative Corner Notch (Burnt Terracotta) */}
         <div 
           className="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-r-2 border-b-2 border-terracotta z-20 pointer-events-none transition-transform duration-300 group-hover:translate-x-0.5 group-hover:translate-y-0.5" 
