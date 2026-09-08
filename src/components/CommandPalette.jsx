@@ -39,8 +39,18 @@ export default function CommandPalette({ isOpen, onClose }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [isAudioMuted, setIsAudioMuted] = useState(getAudioMuted());
-  const { theme, isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const inputRef = useRef(null);
+
+  // Synchronize state during render on open prop change to avoid cascading renders
+  const [prevOpen, setPrevOpen] = useState(isOpen);
+  if (prevOpen !== isOpen) {
+    setPrevOpen(isOpen);
+    if (isOpen) {
+      setQuery('');
+      setSelectedIndex(0);
+    }
+  }
 
   useEffect(() => {
     return subscribeAudioState((muted) => setIsAudioMuted(muted));
@@ -48,124 +58,133 @@ export default function CommandPalette({ isOpen, onClose }) {
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setSelectedIndex(0);
-      setQuery('');
-      playTactileClick('soft');
+      // Focus smoothly on next animation frame without triggering layout jumps
+      const frame = requestAnimationFrame(() => {
+        inputRef.current?.focus({ preventScroll: true });
+      });
+      return () => cancelAnimationFrame(frame);
     }
   }, [isOpen]);
 
-  const actions = [
-    {
-      id: 'works',
-      title: 'Jump to Selected Works & Sandbox',
-      category: 'Navigation',
-      icon: <ArrowRight className="w-4 h-4 text-terracotta" />,
-      run: () => {
-        document.querySelector('#works')?.scrollIntoView({ behavior: 'smooth' });
-        onClose();
-      },
-    },
-    {
-      id: 'about',
-      title: 'Jump to Philosophy & Academics',
-      category: 'Navigation',
-      icon: <ArrowRight className="w-4 h-4 text-stone" />,
-      run: () => {
-        document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
-        onClose();
-      },
-    },
-    {
-      id: 'guestbook',
-      title: 'Jump to Guestbook & Correspondence',
-      category: 'Navigation',
-      icon: <ArrowRight className="w-4 h-4 text-stone" />,
-      run: () => {
-        document.querySelector('#guestbook')?.scrollIntoView({ behavior: 'smooth' });
-        onClose();
-      },
-    },
-    {
-      id: 'email',
-      title: copiedEmail ? 'Email Copied!' : 'Copy Direct Email (kafkalyandra@gmail.com)',
-      category: 'Action',
-      icon: copiedEmail ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4 text-terracotta" />,
-      run: () => {
-        navigator.clipboard.writeText(PERSONAL_INFO.email);
-        setCopiedEmail(true);
-        playTactileClick('success');
-        setTimeout(() => {
-          setCopiedEmail(false);
+  const actions = React.useMemo(
+    () => [
+      {
+        id: 'works',
+        title: 'Jump to Selected Works & Sandbox',
+        category: 'Navigation',
+        icon: <ArrowRight className="w-4 h-4 text-terracotta" />,
+        run: () => {
+          document.querySelector('#works')?.scrollIntoView({ behavior: 'smooth' });
           onClose();
-        }, 1200);
+        },
       },
-    },
-    {
-      id: 'instagram',
-      title: `Open Instagram Profile (${PERSONAL_INFO.instagramHandle})`,
-      category: 'Social',
-      icon: <InstagramIcon className="w-4 h-4 text-terracotta" />,
-      run: () => {
-        window.open(PERSONAL_INFO.instagram, '_blank');
-        onClose();
+      {
+        id: 'about',
+        title: 'Jump to Philosophy & Academics',
+        category: 'Navigation',
+        icon: <ArrowRight className="w-4 h-4 text-stone" />,
+        run: () => {
+          document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
+          onClose();
+        },
       },
-    },
-    {
-      id: 'theme',
-      title: isDark ? 'Switch to Light Mode (Active: Obsidian Pine)' : 'Switch to Dark Mode (Active: Daylight Sand)',
-      category: 'Theme',
-      icon: <Sparkles className="w-4 h-4 text-terracotta" />,
-      run: () => {
-        toggleTheme();
-        onClose();
+      {
+        id: 'guestbook',
+        title: 'Jump to Guestbook & Correspondence',
+        category: 'Navigation',
+        icon: <ArrowRight className="w-4 h-4 text-stone" />,
+        run: () => {
+          document.querySelector('#guestbook')?.scrollIntoView({ behavior: 'smooth' });
+          onClose();
+        },
       },
-    },
-    {
-      id: 'github',
-      title: 'Open GitHub Profile (kffLyan)',
-      category: 'Social',
-      icon: <GithubIcon className="w-4 h-4 text-stone" />,
-      run: () => {
-        window.open(PERSONAL_INFO.github, '_blank');
-        onClose();
+      {
+        id: 'email',
+        title: copiedEmail ? 'Email Copied!' : `Copy Direct Email (${PERSONAL_INFO.email})`,
+        category: 'Action',
+        icon: copiedEmail ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4 text-terracotta" />,
+        run: () => {
+          navigator.clipboard.writeText(PERSONAL_INFO.email);
+          setCopiedEmail(true);
+          playTactileClick('success');
+          setTimeout(() => {
+            setCopiedEmail(false);
+            onClose();
+          }, 1200);
+        },
       },
-    },
-    {
-      id: 'linkedin',
-      title: 'Open LinkedIn Profile',
-      category: 'Social',
-      icon: <LinkedinIcon className="w-4 h-4 text-stone" />,
-      run: () => {
-        window.open(PERSONAL_INFO.linkedin, '_blank');
-        onClose();
+      {
+        id: 'instagram',
+        title: `Open Instagram Profile (${PERSONAL_INFO.instagramHandle})`,
+        category: 'Social',
+        icon: <InstagramIcon className="w-4 h-4 text-terracotta" />,
+        run: () => {
+          window.open(PERSONAL_INFO.instagram, '_blank');
+          onClose();
+        },
       },
-    },
-    {
-      id: 'audio',
-      title: isAudioMuted ? 'Enable Tactile Micro-Audio Clicks' : 'Mute Tactile Micro-Audio Clicks',
-      category: 'Settings',
-      icon: isAudioMuted ? <VolumeX className="w-4 h-4 text-stone" /> : <Volume2 className="w-4 h-4 text-terracotta" />,
-      run: () => {
-        toggleAudioMuted();
+      {
+        id: 'theme',
+        title: isDark ? 'Switch to Light Mode (Active: Obsidian Pine)' : 'Switch to Dark Mode (Active: Daylight Sand)',
+        category: 'Theme',
+        icon: <Sparkles className="w-4 h-4 text-terracotta" />,
+        run: () => {
+          toggleTheme();
+          onClose();
+        },
       },
-    },
-    {
-      id: 'cv',
-      title: 'Download Curriculum Vitae (Summary)',
-      category: 'Document',
-      icon: <FileText className="w-4 h-4 text-stone" />,
-      run: () => {
-        window.open(PERSONAL_INFO.github, '_blank');
-        onClose();
+      {
+        id: 'github',
+        title: 'Open GitHub Profile (kffLyan)',
+        category: 'Social',
+        icon: <GithubIcon className="w-4 h-4 text-stone" />,
+        run: () => {
+          window.open(PERSONAL_INFO.github, '_blank');
+          onClose();
+        },
       },
-    },
-  ];
-
-  const filtered = actions.filter((a) =>
-    a.title.toLowerCase().includes(query.toLowerCase()) ||
-    a.category.toLowerCase().includes(query.toLowerCase())
+      {
+        id: 'linkedin',
+        title: 'Open LinkedIn Profile',
+        category: 'Social',
+        icon: <LinkedinIcon className="w-4 h-4 text-stone" />,
+        run: () => {
+          window.open(PERSONAL_INFO.linkedin, '_blank');
+          onClose();
+        },
+      },
+      {
+        id: 'audio',
+        title: isAudioMuted ? 'Enable Tactile Micro-Audio Clicks' : 'Mute Tactile Micro-Audio Clicks',
+        category: 'Settings',
+        icon: isAudioMuted ? <VolumeX className="w-4 h-4 text-stone" /> : <Volume2 className="w-4 h-4 text-terracotta" />,
+        run: () => {
+          toggleAudioMuted();
+        },
+      },
+      {
+        id: 'cv',
+        title: 'Download Curriculum Vitae (Summary)',
+        category: 'Document',
+        icon: <FileText className="w-4 h-4 text-stone" />,
+        run: () => {
+          window.open(PERSONAL_INFO.github, '_blank');
+          onClose();
+        },
+      },
+    ],
+    [copiedEmail, isDark, isAudioMuted, onClose, toggleTheme]
   );
+
+  const filtered = React.useMemo(() => {
+    if (!query.trim()) return actions;
+    const q = query.toLowerCase();
+    return actions.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        a.category.toLowerCase().includes(q)
+    );
+  }, [actions, query]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
@@ -189,23 +208,24 @@ export default function CommandPalette({ isOpen, onClose }) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 sm:pt-28 px-4">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-28 px-4 pointer-events-auto">
+          {/* Backdrop: solid dark scrim without GPU-killing full-screen backdrop-blur */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             onClick={onClose}
-            className="fixed inset-0 bg-ink/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-ink/50 dark:bg-black/60 will-change-[opacity]"
           />
 
-          {/* Modal Container */}
+          {/* Modal Container: hardware accelerated with instant smooth entrance */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: -10 }}
+            initial={{ opacity: 0, scale: 0.98, y: -8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -10 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-            className="relative w-full max-w-xl rounded-3xl bg-sand border border-linen p-2 shadow-[0_20px_60px_rgba(26,36,33,0.18)] z-10 overflow-hidden font-sans"
+            exit={{ opacity: 0, scale: 0.98, y: -8 }}
+            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-xl rounded-3xl bg-sand border border-linen p-2 shadow-[0_20px_60px_rgba(26,36,33,0.18)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.6)] z-10 overflow-hidden font-sans transform-gpu will-change-transform"
           >
             {/* Search Input Box */}
             <div className="flex items-center gap-3 px-4 py-3 border-b border-linen">
@@ -220,18 +240,21 @@ export default function CommandPalette({ isOpen, onClose }) {
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder="Type a command or jump to section..."
+                autoComplete="off"
+                spellCheck="false"
                 className="w-full bg-transparent text-sm text-ink placeholder:text-stone/60 focus:outline-none font-mono"
               />
               <button
                 onClick={onClose}
                 className="p-1 rounded-lg hover:bg-bone text-stone hover:text-ink transition-colors cursor-pointer"
+                title="Close palette"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Results List */}
-            <div className="max-h-80 overflow-y-auto p-2 space-y-1">
+            <div className="max-h-80 overflow-y-auto p-2 space-y-1 overscroll-contain">
               {filtered.length === 0 ? (
                 <div className="p-8 text-center text-xs font-mono text-stone">
                   No matching commands found for "{query}".
