@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Check, Copy, ArrowUpRight, MessageSquareQuote, Database, Loader2 } from 'lucide-react';
+import { Send, Check, Copy, ArrowUpRight, MessageSquareQuote, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { 
   getGuestbookEntries, 
   addGuestbookEntry, 
-  subscribeToGuestbookUpdates, 
-  getDatabaseStatus 
+  subscribeToGuestbookUpdates 
 } from '../services/guestbookService';
 
 function InstagramIcon({ className = "w-4 h-4" }) {
@@ -23,7 +22,6 @@ function InstagramIcon({ className = "w-4 h-4" }) {
 /**
  * Guestbook & Contact Section
  * Tailored for Muhammad Kafka Lyandra Pratama
- * Connected to Supabase Cloud Database with real-time synchronization.
  */
 export default function Guestbook() {
   const [entries, setEntries] = useState([]);
@@ -33,7 +31,6 @@ export default function Guestbook() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const dbStatus = getDatabaseStatus();
 
   // Load entries from database & initialize real-time subscription
   useEffect(() => {
@@ -253,27 +250,12 @@ export default function Guestbook() {
           </div>
         </div>
 
-        {/* Right Column: Live Cloud Guestbook Form & Stream */}
+        {/* Right Column: Guestbook Form & Stream */}
         <div className="lg:col-span-7 flex flex-col">
           <div className="p-6 sm:p-8 rounded-3xl bg-bone/70 border border-linen/90 mb-10 shadow-[0_4px_24px_rgba(26,36,33,0.02)]">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-              <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-ink font-semibold">
-                <MessageSquareQuote className="w-4 h-4 text-terracotta" />
-                <span>Buku Tamu Publik (Cloud Database)</span>
-              </div>
-
-              {/* Real-Time Database Connection Badge */}
-              {dbStatus.isConfigured ? (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-[11px] font-mono">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>Supabase Live Connected</span>
-                </div>
-              ) : (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-bone border border-linen text-stone text-[11px] font-mono" title="Konfigurasi Supabase ada di .env dan docs/guestbook-setup.sql">
-                  <Database className="w-3 h-3 text-terracotta" />
-                  <span>Cloud DB Ready</span>
-                </div>
-              )}
+            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-ink font-semibold mb-6">
+              <MessageSquareQuote className="w-4 h-4 text-terracotta" />
+              <span>Buku Tamu & Pesan Kolaborasi</span>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -322,16 +304,11 @@ export default function Guestbook() {
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-                <span className="text-[11px] font-mono text-stone">
-                  {dbStatus.isConfigured 
-                    ? 'Pesan tersimpan di cloud database & tersinkronisasi live' 
-                    : 'Pesan tersimpan otomatis & siap disinkronkan ke Supabase'}
-                </span>
+              <div className="flex justify-end pt-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-ink text-sand text-xs font-mono uppercase tracking-wider hover:bg-terracotta transition-colors duration-200 cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-ink text-sand text-xs font-mono uppercase tracking-wider hover:bg-terracotta transition-colors duration-200 cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
