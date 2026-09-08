@@ -114,7 +114,7 @@ export const PROJECTS = [
     tags: ["Next.js", "Supabase", "TypeScript", "Tailwind CSS"],
     image: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?q=80&w=1200&auto=format&fit=crop",
     metric: "Single-Use Expiring Tokens",
-    liveUrl: "https://github.com/kffLyan/osis-voting",
+    liveUrl: "https://osis-voting-kuronami-three.vercel.app/",
     githubUrl: "https://github.com/kffLyan/osis-voting",
     featured: true,
     architectureData: {
@@ -190,7 +190,7 @@ export const PROJECTS = [
     tags: ["HTML5", "CSS3", "JavaScript", "Responsive Design"],
     image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200&auto=format&fit=crop",
     metric: "High Conversion CTA Flow",
-    liveUrl: "https://github.com/kffLyan/Landing-Page-SPMB",
+    liveUrl: "https://landing-page-smkbbc.netlify.app/",
     githubUrl: "https://github.com/kffLyan/Landing-Page-SPMB"
   }
 ];
