@@ -36,7 +36,7 @@ export function ThemeProvider({ children }) {
       if (body) body.classList.add('dark');
       root.style.colorScheme = 'dark';
       const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute('content', '#111614');
+      if (metaTheme) metaTheme.setAttribute('content', '#0F1113');
     } else {
       root.classList.remove('dark');
       if (body) body.classList.remove('dark');

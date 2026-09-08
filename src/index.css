@@ -24,20 +24,20 @@
   html.dark,
   body.dark,
   .dark {
-    --bg-sand-rgb: 17 22 20;
-    --card-bone-rgb: 25 34 30;
-    --card-bone-hover-rgb: 33 44 39;
-    --hairline-linen-rgb: 42 54 49;
-    --ink-slate-rgb: 239 236 227;
-    --muted-stone-rgb: 142 152 148;
+    --bg-sand-rgb: 15 17 19;
+    --card-bone-rgb: 22 25 28;
+    --card-bone-hover-rgb: 30 34 38;
+    --hairline-linen-rgb: 38 43 48;
+    --ink-slate-rgb: 240 242 240;
+    --muted-stone-rgb: 145 152 158;
     --accent-terracotta-rgb: 224 109 68;
 
-    --bg-sand: #111614;
-    --card-bone: #19221E;
-    --card-bone-hover: #212C27;
-    --hairline-linen: #2A3631;
-    --ink-slate: #EFECE3;
-    --muted-stone: #8E9894;
+    --bg-sand: #0F1113;
+    --card-bone: #16191C;
+    --card-bone-hover: #1E2226;
+    --hairline-linen: #262B30;
+    --ink-slate: #F0F2F0;
+    --muted-stone: #91989E;
     --accent-terracotta: #E06D44;
   }
 

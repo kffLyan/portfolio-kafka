@@ -125,7 +125,7 @@ export default function CommandPalette({ isOpen, onClose }) {
       },
       {
         id: 'theme',
-        title: isDark ? 'Switch to Light Mode (Active: Obsidian Pine)' : 'Switch to Dark Mode (Active: Daylight Sand)',
+        title: isDark ? 'Switch to Light Mode (Active: Obsidian Slate)' : 'Switch to Dark Mode (Active: Daylight Sand)',
         category: 'Theme',
         icon: <Sparkles className="w-4 h-4 text-terracotta" />,
         run: () => {

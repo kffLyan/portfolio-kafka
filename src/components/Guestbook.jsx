@@ -57,14 +57,19 @@ export default function Guestbook() {
 
     loadData();
 
-    // Subscribe to new incoming real-time entries
-    const unsubscribe = subscribeToGuestbookUpdates((newEntry) => {
-      setEntries((prev) => {
-        // Prevent duplicate entries if optimistic insert was already added
-        if (prev.some((e) => e.id === newEntry.id)) return prev;
-        return [newEntry, ...prev];
-      });
-    });
+    // Subscribe to new incoming real-time entries and deletions
+    const unsubscribe = subscribeToGuestbookUpdates(
+      (newEntry) => {
+        setEntries((prev) => {
+          // Prevent duplicate entries if optimistic insert was already added
+          if (prev.some((e) => e.id === newEntry.id)) return prev;
+          return [newEntry, ...prev];
+        });
+      },
+      (deletedId) => {
+        setEntries((prev) => prev.filter((e) => e.id !== deletedId));
+      }
+    );
 
     return () => {
       isMounted = false;

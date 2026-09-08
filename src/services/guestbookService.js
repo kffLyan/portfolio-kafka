@@ -19,7 +19,7 @@ export async function getGuestbookEntries() {
 
       if (error) {
         console.warn('Supabase fetch error, falling back to local storage:', error.message);
-      } else if (data && data.length > 0) {
+      } else if (data) {
         const formatted = data.map((row) => ({
           id: row.id,
           name: row.name,
@@ -27,7 +27,7 @@ export async function getGuestbookEntries() {
           message: row.message,
           timestamp: row.created_at,
         }));
-        // Cache to local storage
+        // Cache to local storage so local storage stays in sync with cloud
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(formatted));
         } catch (_) {}
@@ -38,10 +38,10 @@ export async function getGuestbookEntries() {
     }
   }
 
-  // Fallback to local storage or initial seed data
+  // Fallback to local storage or initial seed data only when Supabase fails/unreachable
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
+    if (stored !== null) {
       return JSON.parse(stored);
     }
   } catch (_) {}
@@ -108,10 +108,10 @@ export async function addGuestbookEntry({ name, role, message }) {
 }
 
 /**
- * Subscribe to real-time additions on the guestbook table
+ * Subscribe to real-time additions and deletions on the guestbook table
  * Returns an unsubscribe function
  */
-export function subscribeToGuestbookUpdates(onNewEntry) {
+export function subscribeToGuestbookUpdates(onNewEntry, onDeleteEntry) {
   if (!isSupabaseConfigured || !supabase) {
     return () => {};
   }
@@ -121,17 +121,19 @@ export function subscribeToGuestbookUpdates(onNewEntry) {
       .channel('guestbook-feed')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'guestbook' },
+        { event: '*', schema: 'public', table: 'guestbook' },
         (payload) => {
-          if (payload.new) {
+          if (payload.eventType === 'INSERT' && payload.new) {
             const row = payload.new;
-            onNewEntry({
+            onNewEntry?.({
               id: row.id,
               name: row.name,
               role: row.role || 'Visitor / Collaborator',
               message: row.message,
               timestamp: row.created_at,
             });
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            onDeleteEntry?.(payload.old.id);
           }
         }
       )
